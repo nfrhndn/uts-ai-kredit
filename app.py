@@ -48,24 +48,34 @@ tab1, tab2 = st.tabs(["📝 Form Evaluasi Nasabah", "🧠 Analisis Model AI"])
 
 # ---------- TAB 1: FORM UTAMA ----------
 with tab1:
-    st.subheader("Input Data Pengecekan")
-    st.caption("Silakan masukkan data finansial nasabah dan hasil SLIK OJK.")
+    st.subheader("Input Data Pengecekan Analisis Risiko")
+    st.caption("Silakan masukkan data finansial nasabah berdasarkan berkas fisik dan hasil cek biro kredit.")
     
-    # Membagi form menjadi 2 kolom agar tidak memanjang ke bawah
+    # Membagi form menjadi 2 kolom agar rapi
     col1, col2 = st.columns(2)
     
     with col1:
-        income = st.number_input("Pendapatan Pemohon (Ribuan Rp)", min_value=0, value=5000, help="Contoh: 5000 = Rp 5.000.000")
-        loan_amt = st.number_input("Plafon Pinjaman yang Diajukan", min_value=0, value=150)
+        # User bisa input nominal penuh (Rp 6.000.000)
+        income_rp = st.number_input("Pendapatan Bulanan Pemohon (Rupiah)", min_value=0, value=6000000, step=500000)
+        # Konversi otomatis ke skala dataset di latar belakang (dibagi 1000)
+        income = income_rp / 1000
+        
+        # Penjelasan Plafon Pinjaman ditaruh di bawahnya menggunakan st.caption
+        loan_amt_rp = st.number_input("Plafon Pinjaman yang Diajukan (Rupiah)", min_value=0, value=150000000, step=10000000)
+        loan_amt = loan_amt_rp / 1000000  # Skala dataset untuk nominal pinjaman
+        st.caption("ℹ️ *Plafon Pinjaman: Total nominal uang maksimal yang diajukan/diminta oleh nasabah untuk dipinjam.*")
         
     with col2:
-        co_income = st.number_input("Pendapatan Pasangan/Penjamin (Ribuan Rp)", min_value=0, value=0)
-        credit_history_input = st.selectbox("Hasil SLIK OJK (BI Checking)", ["Aman (Skor 1-2 / Lancar)", "Bermasalah (Skor 3-5 / Nunggak)"])
+        co_income_rp = st.number_input("Pendapatan Bulanan Pasangan / Penjamin (Rupiah)", min_value=0, value=0, step=500000)
+        co_income = co_income_rp / 1000
+        
+        # Penjelasan alur SLIK OJK
+        credit_history_input = st.selectbox("Hasil Pengecekan SLIK OJK (BI Checking)", ["Aman (Skor 1-2 / Lancar)", "Bermasalah (Skor 3-5 / Nunggak)"])
         credit_hist_val = 1.0 if credit_history_input == "Aman (Skor 1-2 / Lancar)" else 0.0
+        st.caption("ℹ️ *Pengecekan SLIK OJK dilakukan manual oleh Petugas Bank via sistem OJK, lalu hasilnya diinput ke dashboard AI ini.*")
 
-    st.markdown("<br>", unsafe_allow_html=True) # Memberi jarak
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    # Tombol dibuat lebar penuh (use_container_width)
     if st.button("🔍 Analisis Kelayakan Pinjaman", type="primary", use_container_width=True):
         input_data = [[income, co_income, loan_amt, credit_hist_val]]
         prediksi = model.predict(input_data)
