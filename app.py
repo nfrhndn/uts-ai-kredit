@@ -52,14 +52,18 @@ model.fit(X_train, y_train)
 # 4. FORM INPUT PENGGUNA (SIDEBAR)
 # ==========================================
 st.sidebar.header("📝 Form Input Petugas Bank")
+st.sidebar.caption("Simulasi input data dari Core Banking System")
 
-income = st.sidebar.number_input("Pendapatan Pemohon (USD)", min_value=0, value=5000)
-co_income = st.sidebar.number_input("Pendapatan Penjamin/Pasangan (USD)", min_value=0.0, value=0.0)
-loan_amt = st.sidebar.number_input("Jumlah Pinjaman yang Diajukan", min_value=0.0, value=150.0)
+# Asumsi nilai 5000 di dataset = Rp 5.000.000 (Skala Ribuan Rupiah)
+income = st.sidebar.number_input("Pendapatan Pemohon (dalam Ribuan Rp)", min_value=0, value=5000, help="Contoh: Ketik 5000 untuk Rp 5.000.000")
+co_income = st.sidebar.number_input("Pendapatan Pasangan/Penjamin (dalam Ribuan Rp)", min_value=0, value=0)
+loan_amt = st.sidebar.number_input("Plafon Pinjaman yang Diajukan", min_value=0, value=150)
 
-# Credit history (1.0 = Punya riwayat baik, 0.0 = Buruk/Tidak punya)
-credit_history_input = st.sidebar.selectbox("Riwayat Kredit Memenuhi Syarat?", ["Ya", "Tidak"])
-credit_hist_val = 1.0 if credit_history_input == "Ya" else 0.0
+st.sidebar.markdown("---")
+st.sidebar.write("**Integrasi Data Eksternal (Simulasi API):**")
+# Mengubah kesan "input manual" menjadi kesan "pengecekan sistem"
+credit_history_input = st.sidebar.selectbox("Hasil Pengecekan SLIK OJK (BI Checking)", ["Aman (Skor 1-2 / Lancar)", "Bermasalah (Skor 3-5 / Nunggak)"])
+credit_hist_val = 1.0 if credit_history_input == "Aman (Skor 1-2 / Lancar)" else 0.0
 
 # ==========================================
 # 5. TOMBOL PREDIKSI & HASIL
