@@ -40,54 +40,35 @@ model.fit(X_train, y_train)
 # ==========================================
 tab1, tab2 = st.tabs(["📝 Form Evaluasi Nasabah", "🧠 Analisis Model AI"])
 
+# ---------- TAB 1: FORM UTAMA ----------
 with tab1:
     st.subheader("Input Data Pengecekan Analisis Risiko")
-    st.caption("Silakan masukkan data finansial nasabah. Format Rp akan terkonversi otomatis di bawah kotak input.")
+    st.caption("Silakan masukkan data finansial nasabah.")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        # PENDAPATAN PEMOHON
-        inc_raw = st.text_input("Pendapatan Bulanan Pemohon (Ketik Angka Saja)", value="6000000")
-        # Logika pemformatan otomatis secara real-time di bawah kotak
-        try:
-            inc_val = int(inc_raw) if inc_raw else 0
-            st.markdown(f"**Format Terkonversi:** `Rp{inc_val:,}`".replace(",", "."))
-        except ValueError:
-            st.error("Masukkan angka yang valid!")
-            inc_val = 0
-        income = inc_val / 1000
-
+        # Menggunakan format bawaan Streamlit untuk pemisah ribuan otomatis di dalam kotak
+        income_rp = st.number_input("Pendapatan Bulanan Pemohon (Format: Rp. Angka)", min_value=0, value=6000000, step=500000, format="%d")
+        st.markdown(f"**Nilai Terkonfirmasi:** Rp {income_rp:,}".replace(",", "."))
+        income = income_rp / 1000
+        
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # PLAFON PINJAMAN
-        loan_raw = st.text_input("Plafon Pinjaman yang Diajukan (Ketik Angka Saja)", value="150000000")
-        try:
-            loan_val = int(loan_raw) if loan_raw else 0
-            st.markdown(f"**Format Terkonversi:** `Rp{loan_val:,}`".replace(",", "."))
-        except ValueError:
-            st.error("Masukkan angka yang valid!")
-            loan_val = 0
-        loan_amt = loan_val / 1000000
+        loan_amt_rp = st.number_input("Plafon Pinjaman yang Diajukan (Format: Rp. Angka)", min_value=0, value=150000000, step=10000000, format="%d")
+        st.markdown(f"**Nilai Terkonfirmasi:** Rp {loan_amt_rp:,}".replace(",", "."))
+        loan_amt = loan_amt_rp / 1000000
         st.caption("ℹ️ *Plafon Pinjaman: Total nominal uang maksimal yang diajukan oleh nasabah.*")
         
     with col2:
-        # PENDAPATAN PASANGAN
-        co_raw = st.text_input("Pendapatan Bulanan Pasangan / Penjamin (Ketik Angka Saja)", value="0")
-        try:
-            co_val = int(co_raw) if co_raw else 0
-            st.markdown(f"**Format Terkonversi:** `Rp{co_val:,}`".replace(",", "."))
-        except ValueError:
-            st.error("Masukkan angka yang valid!")
-            co_val = 0
-        co_income = co_val / 1000
+        co_income_rp = st.number_input("Pendapatan Bulanan Pasangan / Penjamin (Format: Rp. Angka)", min_value=0, value=0, step=500000, format="%d")
+        st.markdown(f"**Nilai Terkonfirmasi:** Rp {co_income_rp:,}".replace(",", "."))
+        co_income = co_income_rp / 1000
 
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # SLIK OJK
         credit_history_input = st.selectbox("Hasil Pengecekan SLIK OJK (BI Checking)", ["Aman (Skor 1-2 / Lancar)", "Bermasalah (Skor 3-5 / Nunggak)"])
         credit_hist_val = 1.0 if credit_history_input == "Aman (Skor 1-2 / Lancar)" else 0.0
-        st.caption("ℹ️ *Pengecekan SLIK OJK dilakukan manual oleh Petugas Bank via sistem OJK.*")
 
     st.markdown("---")
     
@@ -95,8 +76,8 @@ with tab1:
         input_data = [[income, co_income, loan_amt, credit_hist_val]]
         prediksi = model.predict(input_data)
         
-        formatted_loan = f"Rp{loan_val:,}".replace(",", ".")
-        formatted_income = f"Rp{inc_val:,}".replace(",", ".")
+        formatted_loan = f"Rp{loan_amt_rp:,}".replace(",", ".")
+        formatted_income = f"Rp{income_rp:,}".replace(",", ".")
         
         st.markdown(f"### 💡 Keputusan Sistem untuk Pengajuan {formatted_loan}:")
         if prediksi[0] == 1:
