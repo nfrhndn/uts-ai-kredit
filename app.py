@@ -55,36 +55,45 @@ with tab1:
     col1, col2 = st.columns(2)
     
     with col1:
-        # User bisa input nominal penuh (Rp 6.000.000)
-        income_rp = st.number_input("Pendapatan Bulanan Pemohon (Rupiah)", min_value=0, value=6000000, step=500000)
-        # Konversi otomatis ke skala dataset di latar belakang (dibagi 1000)
+        # Menampilkan petunjuk format Rupiah yang benar sesuai PUEBI/KBBI
+        st.markdown("**Pendapatan Bulanan Pemohon**")
+        income_rp = st.number_input("Format Nilai: (Contoh: ketik 6000000 untuk Rp6.000.000)", min_value=0, value=6000000, step=500000, key="inc")
         income = income_rp / 1000
         
-        # Penjelasan Plafon Pinjaman ditaruh di bawahnya menggunakan st.caption
-        loan_amt_rp = st.number_input("Plafon Pinjaman yang Diajukan (Rupiah)", min_value=0, value=150000000, step=10000000)
-        loan_amt = loan_amt_rp / 1000000  # Skala dataset untuk nominal pinjaman
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        st.markdown("**Plafon Pinjaman yang Diajukan**")
+        loan_amt_rp = st.number_input("Format Nilai: (Contoh: ketik 150000000 untuk Rp150.000.000)", min_value=0, value=150000000, step=10000000, key="loan")
+        loan_amt = loan_amt_rp / 1000000  # Skala dataset
         st.caption("ℹ️ *Plafon Pinjaman: Total nominal uang maksimal yang diajukan/diminta oleh nasabah untuk dipinjam.*")
         
     with col2:
-        co_income_rp = st.number_input("Pendapatan Bulanan Pasangan / Penjamin (Rupiah)", min_value=0, value=0, step=500000)
+        st.markdown("**Pendapatan Bulanan Pasangan / Penjamin**")
+        co_income_rp = st.number_input("Format Nilai: (Contoh: ketik 0 jika tidak ada penjamin)", min_value=0, value=0, step=500000, key="co_inc")
         co_income = co_income_rp / 1000
         
-        # Penjelasan alur SLIK OJK
-        credit_history_input = st.selectbox("Hasil Pengecekan SLIK OJK (BI Checking)", ["Aman (Skor 1-2 / Lancar)", "Bermasalah (Skor 3-5 / Nunggak)"])
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        st.markdown("**Hasil Pengecekan SLIK OJK (BI Checking)**")
+        credit_history_input = st.selectbox("Pilih Status Kelancaran Kredit Nasabah", ["Aman (Skor 1-2 / Lancar)", "Bermasalah (Skor 3-5 / Nunggak)"])
         credit_hist_val = 1.0 if credit_history_input == "Aman (Skor 1-2 / Lancar)" else 0.0
         st.caption("ℹ️ *Pengecekan SLIK OJK dilakukan manual oleh Petugas Bank via sistem OJK, lalu hasilnya diinput ke dashboard AI ini.*")
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("---")
     
     if st.button("🔍 Analisis Kelayakan Pinjaman", type="primary", use_container_width=True):
         input_data = [[income, co_income, loan_amt, credit_hist_val]]
         prediksi = model.predict(input_data)
         
-        st.markdown("### 💡 Keputusan Sistem:")
+        # Format nominal agar tampil cantik sesuai KBBI saat tombol ditekan
+        formatted_income = f"Rp{income_rp:,}".replace(",", ".")
+        formatted_loan = f"Rp{loan_amt_rp:,}".replace(",", ".")
+        
+        st.markdown(f"### 💡 Keputusan Sistem untuk Pengajuan {formatted_loan}:")
         if prediksi[0] == 1:
-            st.success("🎉 **STATUS: DISETUJUI (Risiko Rendah)** - Nasabah memiliki rekam jejak dan kapasitas finansial yang layak untuk diberikan pinjaman.")
+            st.success(f"🎉 **STATUS: DISETUJUI (Risiko Rendah)** - Nasabah dengan pendapatan {formatted_income} layak untuk diberikan pinjaman.")
         else:
-            st.error("⚠️ **STATUS: DITOLAK (Risiko Tinggi)** - Nasabah berisiko gagal bayar berdasarkan pola historis.")
+            st.error(f"⚠️ **STATUS: DITOLAK (Risiko Tinggi)** - Nasabah dengan pendapatan {formatted_income} berisiko tinggi gagal bayar berdasarkan pola historis data.")
 
 # ---------- TAB 2: METRIK AI (Biar Dosen Yakin Ini Aplikasi AI) ----------
 with tab2:
