@@ -6,9 +6,9 @@ from sklearn.ensemble import RandomForestClassifier
 # ==========================================
 # 1. JUDUL & DESKRIPSI APLIKASI UI
 # ==========================================
-st.set_page_config(page_title="Prediksi Risiko Kredit", layout="centered")
-st.title("🏦 Aplikasi Prediksi Persetujuan Pinjaman")
-st.write("Aplikasi sederhana menggunakan **Machine Learning (Random Forest)** untuk memprediksi kelayakan pengajuan kredit/pinjaman nasabah berdasarkan data riwayat finansial.")
+st.set_page_config(page_title="Dashboard Prediksi Kredit", layout="centered")
+st.title("🏦 Dashboard Internal: Analisis Risiko Kredit")
+st.write("Sistem Pendukung Keputusan (DSS) bagi **Petugas Bank / Credit Analyst** untuk mengevaluasi kelayakan pengajuan pinjaman nasabah secara otomatis menggunakan Machine Learning (Random Forest).")
 st.write("---")
 
 # ==========================================
@@ -51,7 +51,7 @@ model.fit(X_train, y_train)
 # ==========================================
 # 4. FORM INPUT PENGGUNA (SIDEBAR)
 # ==========================================
-st.sidebar.header("📝 Masukkan Data Nasabah")
+st.sidebar.header("📝 Form Input Petugas Bank")
 
 income = st.sidebar.number_input("Pendapatan Pemohon (USD)", min_value=0, value=5000)
 co_income = st.sidebar.number_input("Pendapatan Penjamin/Pasangan (USD)", min_value=0.0, value=0.0)
